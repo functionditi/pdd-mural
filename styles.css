@@ -1,0 +1,129 @@
+@font-face {
+    font-family: 'Step-Mono';
+    src: url('./assets/fonts/Steps-Mono-Thin.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'Neau-Montreal';
+    src: url('./assets/fonts/NeueMontreal-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+
+h1 {
+    font-family: 'Step-Mono';
+    font-size: 4rem;
+    line-height: 4rem;
+}
+
+p{
+    font-family: 'Neau-Montreal';
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.section {
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.left {
+    flex: 1;
+    background-color: #fff;
+    border-right: 2px solid #ccc;
+}
+
+.center {
+    position: relative;
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #f9f9f9;
+    margin: 0px;
+    padding: 0px;
+    border-right: 2px solid #ccc;
+}
+
+.right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    padding: 0px;
+}
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0px;
+    margin-bottom: 20px;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.tabs button {
+    width: calc(50% - 0px);
+}
+
+button {
+    font-family: 'Neau-Montreal';
+    border-radius: 15px 15px 0px 0px;
+    padding: 10px;
+    margin: 0px;
+    background-color: #e0e0e0;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+
+button:hover {
+    background-color: #ccc;
+}
+
+.right .tabs {
+    align-self: flex-start;
+}
+
+.right .section-content {
+    flex-grow: 1;
+    padding-left: 20px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    margin-top: 20px;
+    max-height: 650px;
+    overflow-y: scroll;
+}
+
+.gallery .image-container {
+    width: 100%;
+    height: 200px;
+    background-color: #e0e0e0;
+    border: 2px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
