@@ -2,7 +2,6 @@
 let W, H;
 let selectedImage = null;
 let selectedImageFolder = null;
-let bodyPartsImages = { Heads: null, Torso: null, 'Left-Arm': null, 'Right-Arm': null, 'Left-Leg': null, 'Right-Leg': null };
 const updateCanvasSize = () => {
   const centerSection = document.querySelector('.section.center');
   W = centerSection.clientWidth * 1;
@@ -36,18 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (imgElement) {
           console.log(`${index + 1} clicked, Image: ${imgElement.src.split('/').pop()}`);
           const imgName = imgElement.src.split('/').pop();
+          selectedImage = images.find(image => image.fileName === imgName);
           selectedImageFolder = imgElement.src.split('/')[imgElement.src.split('/').length - 2];
           console.log(`Selected image is from folder: ${selectedImageFolder}`);
-
-          // Filter the images based on the folder name and file name to get the correct image from the correct folder
-          selectedImage = images.find(
-            image => image.fileName === imgName && image.folderName === selectedImageFolder
-          );
-
-          if (bodyPartsImages.hasOwnProperty(selectedImageFolder) && selectedImage) {
-            bodyPartsImages[selectedImageFolder] = selectedImage;
-          }
-
         } else {
           console.log(`${index + 1} clicked, No image found`);
         }
@@ -99,9 +89,9 @@ const translationSettings = { ...translationSettingsDefault };
 const translationFolder = gui.addFolder('Translation');
 
 const canvasSettingsDefault = {
-  dot: false,
+  dot: true,
   dotSize: 6,
-  description: false,
+  description: true,
   line: false,
   invert: false,
 };
@@ -174,15 +164,6 @@ const initializeSettings = () => {
   Object.assign(translationSettings, translationSettingsDefault);
   Object.assign(canvasSettings, canvasSettingsDefault);
   gui.updateDisplay();
-
-  // Assign random images to each body part initially
-  const bodyParts = ['Heads', 'Torso', 'Left-Arm', 'Right-Arm', 'Left-Leg', 'Right-Leg'];
-  bodyParts.forEach(part => {
-    const partImages = images.filter(image => image.folderName === part);
-    if (partImages.length > 0) {
-      bodyPartsImages[part] = random(partImages);
-    }
-  });
 };
 
 let images = [];
@@ -190,7 +171,7 @@ let images = [];
 function preload() {
   const folders = ['Heads', 'Left-Arm', 'Left-Leg', 'Right-Arm', 'Right-Leg', 'Torso'];
   for (const folder of folders) {
-    for (let i = 1; i <= 19; i++) {
+    for (let i = 1; i <= 11; i++) {
       const img = loadImage(`./assets/images/${folder}/artwork-${i.toString().padStart(2, '0')}.svg`);
       img.fileName = `artwork-${i.toString().padStart(2, '0')}.svg`;
       img.folderName = folder;
@@ -205,14 +186,12 @@ function setup() {
   const canvas = createCanvas(W, H);
   canvas.parent('walkerCanvas');
   textAlign(CENTER, CENTER);
-  pixelDensity(5);
 
   // Prepare GUI
   prepareDatGUI();
 }
 
 function draw() {
-  randomSeed(2);
   updateCanvasSize();
   resizeCanvas(W, H);
   // Set speed
@@ -239,10 +218,10 @@ function draw() {
 
   // Drawing Part
   const markers = bmw.getMarkers(walkerSettings.walkerHeight);
-  translate(W / 2, 50+ H / 2);
+  translate(W / 2, H / 2);
 
   // Choose colors
-  let bgColor = 255;
+  let bgColor = 220;
   let lineColor = 30;
   if (canvasSettings.invert) {
     bgColor = 30;
@@ -261,8 +240,8 @@ function draw() {
 
   // Draw dots next.
   if (canvasSettings.dot) {
-    for (let marker of markers) {
-      circle(marker.x, marker.y, canvasSettings.dotSize);
+    for (let i = 0; i < markers.length; i++) {
+      circle(markers[i].x, markers[i].y, canvasSettings.dotSize);
     }
   }
 
@@ -271,53 +250,49 @@ function draw() {
     push();
     noStroke();
     fill(lineColor);
-    markers.forEach((m, idx) => {
-      text(idx, m.x, m.y + 20);
+    markers.forEach((m, i) => {
+      text(i, m.x, m.y + 20);
     });
     pop();
   }
 
-  // Draw random or selected images at appropriate marker positions based on body part
-  const bodyPartMarkerIndices = {
-    'Heads': 0,
-    'Torso': 8,
-    'Left-Arm': 6,
-    'Right-Arm': 3,
-    'Left-Leg': 13,
-    'Right-Leg': 10
-  };
-
-  for (const [part, markerIndex] of Object.entries(bodyPartMarkerIndices)) {
-    if (bodyPartsImages[part] && markers.length > markerIndex) {
-      imageMode(CENTER);
-      push();
-      if (part === 'Left-Arm') {
-        translate(markers[markerIndex].x, markers[markerIndex].y);
-        rotate(radians(random(-45, -30)));
-        image(bodyPartsImages[part], -100, 0);
-      } else if (part === 'Right-Arm') {
-        translate(markers[markerIndex].x, markers[markerIndex].y);
-        rotate(radians(random(30, 45)));
-        image(bodyPartsImages[part], 100, 0);
-      } else if (part === 'Left-Leg') {
-        translate(markers[markerIndex].x, markers[markerIndex].y);
-        rotate(radians(90+ random(10, 35)));
-        image(bodyPartsImages[part], 50, 50);
-        
+  // Draw selected image at appropriate marker position based on folder
+  if (selectedImage && markers.length > 1) {
+    let i;
+    switch (selectedImageFolder) {
+      case 'Heads':
+        i = 0;
+        break;
+      case 'Torso':
+        i = 8;
+        break;
+      case 'Left-Arm':
+        i = 6;
+        break;
+      case 'Right-Arm':
+        i = 3;
+        break;
+      case 'Left-Leg':
+        i = 13;
+        break;
+      case 'Right-Leg':
+        i = 10;
+        break;
+      default:
+        i = 0;
+    }
+    if (markers.length > i) {
+      const imageIndex = images.findIndex(image => image.fileName === selectedImage.fileName && image.folderName === selectedImageFolder);
+      if (imageIndex !== -1) {
+        imageMode(CENTER);
+        image(images[imageIndex], markers[i].x, markers[i].y);
       }
-      else if (part === 'Right-Leg') {
-        translate(markers[markerIndex].x, markers[markerIndex].y);
-        rotate(radians(90+ random(-10, -35)));
-        image(bodyPartsImages[part], 50, -50);
-      }
-      else if (part === 'Torso') {
-        image(bodyPartsImages[part], markers[markerIndex].x, markers[markerIndex].y, bodyPartsImages[part].width * 2, bodyPartsImages[part].height * 2);
-      } else {
-        image(bodyPartsImages[part], markers[markerIndex].x, markers[markerIndex].y);
-      }
-      pop();
     }
   }
+    
+  }
+
+
 
   // Show center for debug
   const showCenter = false;
@@ -327,4 +302,4 @@ function draw() {
     circle(0, 0, 10);
     pop();
   }
-}
+

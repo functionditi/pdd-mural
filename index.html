@@ -23,32 +23,88 @@
         </div>
         <div class="section right">
             <div class="tabs">
-                <button>Head</button>
-                <button>Torso</button>
-                <button>Left Arm</button>
-                <button>Right Arm</button>
-                <button>Left Leg</button>
-                <button>Right Leg</button>
+                <button id="headTab" class="active">Head</button>
+                <button id="torsoTab">Torso</button>
+                <button id="leftArmTab">Left Arm</button>
+                <button id="rightArmTab">Right Arm</button>
+                <button id="leftLegTab">Left Leg</button>
+                <button id="rightLegTab">Right Leg</button>
             </div>
-            <div class="gallery">
-                <div class="image-container">Image 1</div>
-                <div class="image-container">Image 2</div>
-                <div class="image-container">Image 3</div>
-                <div class="image-container">Image 4</div>
-                <div class="image-container">Image 5</div>
-                <div class="image-container">Image 6</div>
-                <div class="image-container">Image 7</div>
-                <div class="image-container">Image 8</div>
-                <div class="image-container">Image 9</div>
-                <div class="image-container">Image 10</div>
-                <div class="image-container">Image 11</div>
-                <div class="image-container">Image 12</div>
+            <div class="gallery" id="gallery"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const gallery = document.getElementById('gallery');
+        const tabs = document.querySelectorAll('.tabs button');
+        const headTab = document.getElementById('headTab');
+        const torsoTab = document.getElementById('torsoTab');
+
+        // Load default images for the head section
+        loadImages('./assets/images/Heads/artwork-');
+
+        // Add event listeners to tabs
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (event) => {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                // Add active class to the clicked tab
+                event.target.classList.add('active');
+                
+                // Load appropriate images based on the selected tab
+                if (event.target.id === 'headTab') {
+                    loadImages('./assets/images/Heads/artwork-');
+                } else if (event.target.id === 'torsoTab') {
+                    loadImages('./assets/images/Torso/artwork-');
+                } else if (event.target.id === 'leftArmTab') {
+                    loadImages('./assets/images/Left-Arm/artwork-');
+                } else if (event.target.id === 'rightArmTab') {
+                    loadImages('./assets/images/Right-Arm/artwork-');
+                } else if (event.target.id === 'leftLegTab') {
+                    loadImages('./assets/images/Left-Leg/artwork-');
+                } else if (event.target.id === 'rightLegTab') {
+                    loadImages('./assets/images/Right-Leg/artwork-');
+                }
+                // You can add more conditions here for other body parts
+            });
+        });
+
+        function loadImages(pathPrefix) {
+            // Clear existing images
+            gallery.innerHTML = '';
+            // Create an array with image indices and shuffle it
+            const imageIndices = Array.from({ length: 19 }, (_, i) => i + 1);
+            shuffleArray(imageIndices);
+            
+            // Load new set of images in random order
+            imageIndices.forEach(i => {
+                const imageContainer = document.createElement('div');
+                imageContainer.classList.add('image-container');
+                const img = document.createElement('img');
+                img.src = `${pathPrefix}${i.toString().padStart(2, '0')}.svg`;
+                img.alt = `Artwork ${i}`;
+                if (pathPrefix.includes('Left-Leg') || pathPrefix.includes('Right-Leg')) {
+                    img.style.transform = 'rotate(90deg)';
+                }
+                imageContainer.appendChild(img);
+                gallery.appendChild(imageContainer);
+            });
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+    });
+</script>
+                
+            </div>
+               
             </div>
     
-        </div>
-        </div>
-    </div>
-    <script src="script.js"></script>
+        
+    
+<script src="script.js"></script>
    
 </body>
 </html>
